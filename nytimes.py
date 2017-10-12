@@ -13,7 +13,7 @@ from bs4 import BeautifulSoup as Soup
 # -----------------------------------------------------------------------------
 CACHE_FNAME = 'cache_file.json'
 DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
-DEBUG = True
+DEBUG = True    
 
 # -----------------------------------------------------------------------------
 # Load cache file
@@ -29,25 +29,28 @@ except:
 # -----------------------------------------------------------------------------
 # Cache functions
 # -----------------------------------------------------------------------------
-def has_cache_expired(timestamp_str):
+def has_cache_expired(timestamp_str, expire_in_days):
     """Check if cache timestamp is over expire_in_days old"""
     # gives current datetime
     now = datetime.now()
+    #print(now)
 
     # datetime.strptime converts a formatted string into datetime object
     cache_timestamp = datetime.strptime(timestamp_str, DATETIME_FORMAT)
-
+    #print(cache_timestamp)
     # subtracting two datetime objects gives you a timedelta object
     delta = now - cache_timestamp
     delta_in_days = delta.days
-
+    #print(delta_in_days)
     # now that we have days as integers, we can just use comparison
     # and decide if cache has expired or not
     if delta_in_days > expire_in_days:
-        return False
-    else:
+        #print("Cache Expired")
         return True
-
+    else:
+        #print("Cache not yet Expired")
+        return False
+        
 
 def get_from_cache(url):
     """If URL exists in cache and has not expired, return the html, else return None"""
@@ -179,7 +182,7 @@ def load_articles_from_headlines_only(section_soup):
     stories = section_soup.find_all('li')
     for story_soup in stories:
         story_dict = {
-            'title': story_soup.find('h6').text.strip(),
+            'title': story_soup.find('h6').contents[0].text.strip(),
             'url': story_soup.find('a').get('href')
         }
 
